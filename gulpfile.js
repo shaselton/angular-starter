@@ -11,7 +11,9 @@ var gulp = require('gulp'),
     cache = require('gulp-cache'),
     rename = require('gulp-rename'),
     notify = require('gulp-notify'),
-    livereload = require('gulp-livereload'),
+    browserSync = require('browser-sync'),
+    autoprefixer = require('gulp-autoprefixer'),
+    inject = require('gulp-inject'),
     del = require('del');
 
 // Styles
@@ -56,22 +58,24 @@ gulp.task('default', ['clean'], function() {
   gulp.start('styles', 'scripts', 'images');
 });
 
-// Watch
-gulp.task('watch', function() {
+function browserSyncInit(baseDir, files){
+  browserSync.instance = browserSync.init(files, {
+    startPath: '/',
+    server: {
+      baseDir: baseDir
+    }
+  });
+}
 
-  // Watch .scss files
-  gulp.watch('src/styles/**/*.scss', ['styles']);
+gulp.task('serve', ['inject'], function(){
+    browserSyncInit( ['tmp', 'src'], ['tmp/**/*.css'] );
+  }
+);
 
-  // Watch .js files
-  gulp.watch('src/scripts/**/*.js', ['scripts']);
-
-  // Watch image files
-  gulp.watch('src/images/**/*', ['images']);
-
-  // Create LiveReload server
-  livereload.listen();
-
-  // Watch any files in dist/, reload on change
-  gulp.watch(['dist/**']).on('change', livereload.changed);
+gulp.task('inject', function(){
+  
+  var injectStyles = gulp.src([
+    'tmp/**/*.css'
+  ], {read: false});
 
 });
