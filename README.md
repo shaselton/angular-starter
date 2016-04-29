@@ -1,7 +1,14 @@
 ### Steps
 
+#### Install bower
+```
+npm install -g bower
+```
+
 #### Download Project
-```git clone git@github.com:shaselton/angular-starter.git```
+```
+git clone git@github.com:shaselton/angular-starter.git
+```
 
 #### Install dependencies
 ```
