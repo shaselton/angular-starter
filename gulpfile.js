@@ -11,71 +11,149 @@ var gulp = require('gulp'),
     cache = require('gulp-cache'),
     rename = require('gulp-rename'),
     notify = require('gulp-notify'),
-    browserSync = require('browser-sync'),
+    browserSync = require('browser-sync').create(),  // https://www.browsersync.io/docs/gulp/
     autoprefixer = require('gulp-autoprefixer'),
     inject = require('gulp-inject'),
+    sourcemaps = require('gulp-sourcemaps'),
+    wiredep = require('wiredep').stream,
+    runSequence = require('run-sequence'),
     del = require('del');
 
 // Styles
-gulp.task('styles', function() {
+gulp.task('styles:development', function() {
+  return sass('src/styles/main.scss', { style: 'expanded', sourcemap: true })
+    .on('error', function(err){ console.log('Error!', err); })
+    .pipe(autoprefixer('last 2 version'))
+    .pipe(sourcemaps.write('./', {
+      includeContent: false,
+      sourceRoot: 'src/styles'
+    }))
+    .pipe(gulp.dest('tmp'))
+    .pipe(browserSync.stream({match: 'tmp/*.css'}))
+    .pipe(notify({ message: 'Styles task complete' }));
+});
+
+gulp.task('styles:production', function() {
   return sass('src/styles/main.scss', { style: 'expanded' })
     .pipe(autoprefixer('last 2 version'))
-    .pipe(gulp.dest('dist/assets/styles'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(cssnano())
-    .pipe(gulp.dest('dist/styles'))
+    .pipe(gulp.dest('dist'))
     .pipe(notify({ message: 'Styles task complete' }));
 });
 
 // Scripts
-gulp.task('scripts', function() {
+gulp.task('scripts:development', function() {
   return gulp.src('src/scripts/**/*.js')
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter('default'))
-    .pipe(concat('main.js'))
-    .pipe(gulp.dest('dist/assets/scripts'))
-    .pipe(rename({ suffix: '.min' }))
+    .pipe(gulp.dest('tmp'))
+    .pipe(browserSync.stream())
+    .pipe(notify({ message: 'Scripts task complete' }));
+});
+
+gulp.task('scripts:production', function() {
+  return gulp.src('src/scripts/**/*.js')
+    .pipe(jshint('.jshintrc'))
+    .pipe(jshint.reporter('default'))
+    .pipe(concat('app.min.js'))
     .pipe(uglify())
-    .pipe(gulp.dest('dist/scripts'))
+    .pipe(gulp.dest('dist'))
     .pipe(notify({ message: 'Scripts task complete' }));
 });
 
 // Images
-gulp.task('images', function() {
-  return gulp.src('src/images/**/*')
+gulp.task('images:development', function() {
+  return gulp.src('src/img/**/*')
     .pipe(cache(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true })))
-    .pipe(gulp.dest('dist/assets/images'))
+    .pipe(gulp.dest('tmp/img'))
+    .pipe(notify({ message: 'Images task complete' }));
+});
+
+gulp.task('images:production', function() {
+  return gulp.src('src/img/**/*')
+    .pipe(cache(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true })))
+    .pipe(gulp.dest('dist/img'))
     .pipe(notify({ message: 'Images task complete' }));
 });
 
 // Clean
-gulp.task('clean', function() {
-  return del(['dist/assets/styles', 'dist/assets/scripts', 'dist/assets/images']);
+gulp.task('clean:development', function() {
+  return del(['tmp/*']);
 });
 
-// Default task
-gulp.task('default', ['clean'], function() {
-  gulp.start('styles', 'scripts', 'images');
+gulp.task('clean:production', function() {
+  return del(['dist/*']);
 });
 
-function browserSyncInit(baseDir, files){
-  browserSync.instance = browserSync.init(files, {
-    startPath: '/',
+gulp.task('serve:development', function(){
+  runSequence('clean:development',
+              ['styles:development', 'scripts:development', 'images:development'],
+              'inject:development',
+              'browser:development');
+});
+
+gulp.task('serve:production', function(){
+  runSequence('clean:production',
+              ['styles:production', 'scripts:production', 'images:production'],
+              'inject:production');
+});
+
+gulp.task('browser:development', function(){
+  browserSync.instance = browserSync.init({
+    startPath: '/tmp',
     server: {
-      baseDir: baseDir
-    }
+      baseDir: './'
+    },
+    files: ['tmp/*.css']
   });
-}
 
-gulp.task('serve', ['inject'], function(){
-    browserSyncInit( ['tmp', 'src'], ['tmp/**/*.css'] );
-  }
-);
+  gulp.watch(["src/**/*.scss", "src/**/*.css"], ['styles:development']);
+  gulp.watch(["src/*.html"], ['inject:development']);
+  gulp.watch(["src/**/*.js", "src/*.js"], ['scripts:development']);
+  gulp.watch("tmp/index.html").on('change', browserSync.reload);
+});
 
-gulp.task('inject', function(){
-  
+gulp.task('inject:development', function(){
   var injectStyles = gulp.src([
-    'tmp/**/*.css'
+    './tmp/*.css'
   ], {read: false});
 
+  var injectScripts = gulp.src([
+    './tmp/**/*.js',
+    './tmp/*.js'
+  ], {read: false});
+
+  var wiredepOptions = { 
+    directory: 'bower_components'
+  };
+
+  return gulp.src('src/index.html')
+    .pipe(inject(injectStyles))
+    .pipe(inject(injectScripts))
+    .pipe(wiredep(wiredepOptions))
+    .pipe(gulp.dest('tmp/'))
+    .pipe(notify({ message: 'Injection Finished' }));
+});
+
+gulp.task('inject:production', function(){
+  var injectStyles = gulp.src([
+    './dist/*.css'
+  ], {read: false});
+
+  var injectScripts = gulp.src([
+    './dist/**/*.js',
+    './dist/*.js'
+  ], {read: false});
+
+  var wiredepOptions = { 
+    directory: 'bower_components'
+  };
+
+  return gulp.src('src/index.html')
+    .pipe(inject(injectStyles))
+    .pipe(inject(injectScripts))
+    .pipe(wiredep(wiredepOptions))
+    .pipe(gulp.dest('dist/'))
+    .pipe(notify({ message: 'Injection Finished' }));
 });
