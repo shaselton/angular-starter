@@ -1,5 +1,6 @@
 ;(function(){
 	'use strict';
 
-	console.log('haselton');
-})();
+	angular.module('app', 
+    ['ngMessages']);
+})(window.angular);
