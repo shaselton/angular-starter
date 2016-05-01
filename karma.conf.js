@@ -15,6 +15,9 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'bower_components/angular/angular.js',
+      'bower_components/angular-mocks/angular-mocks.js',
+      'bower_components/angular-mocks/angular-messages.js',
       'tests/**/*.js',
       'tests/*.js'
     ],
@@ -28,6 +31,8 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
+      'src/scripts/templates/*.html': 'ng-html2js',
+      'src/**/*.js': ['coverage']
     },
 
 
@@ -53,11 +58,31 @@ module.exports = function(config) {
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
 
+    plugins: [
+      'karma-jasmine',
+      'karma-phantomjs-launcher',
+      'karma-coverage',
+      'karma-junit-reporter',
+      'karma-ng-html2js-preprocessor'
+    ],
+
+    reporters: ['progress', 'coverage', 'junit'],
+    junitReporter: {
+      outputDir: './test-reports'
+    },
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS'],
 
+    coverageReporter: {
+      type: 'html',
+      dir: 'coverage/'
+    },
+
+    ngHtml2JsPreprocessor: {
+      stripPrefix: 'src/scripts/templates/'
+    },
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
