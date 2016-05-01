@@ -13,9 +13,6 @@ git clone git@github.com:shaselton/angular-starter.git
 #### Install dependencies
 ```
 npm install
-```
-
-```
 bower install
 ```
 
