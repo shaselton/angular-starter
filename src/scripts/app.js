@@ -1,6 +1,10 @@
+var app = window.app || {};
+
 ;(function(){
 	'use strict';
 
-	angular.module('app', 
-    ['ngMessages']);
-})(window.angular);
+	app = angular.module('app', [
+    'ui.router',
+    'ngMessages'
+  ]);
+})(window.angular, window.app);

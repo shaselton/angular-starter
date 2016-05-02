@@ -44,7 +44,7 @@ gulp.task('styles:production', function() {
 
 // Scripts
 gulp.task('scripts:development', function() {
-  return gulp.src('src/scripts/**/*.js')
+  return gulp.src(['src/scripts/**/*.js', 'src/scripts/**/*.html'])
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter('default'))
     .pipe(gulp.dest('tmp'))
@@ -104,8 +104,7 @@ gulp.task('browser:development', function(){
     startPath: '/tmp',
     server: {
       baseDir: './'
-    },
-    files: ['tmp/*.css']
+    }
   });
 
   gulp.watch(["src/**/*.scss", "src/**/*.css"], ['styles:development']);

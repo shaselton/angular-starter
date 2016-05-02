@@ -1,16 +1,19 @@
+<!DOCTYPE html>
 <html ng-app="app">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- bower:css -->
   <!-- endbower -->
 
   <!-- inject:css -->
   <!-- endinject -->
   <body>
-
-  <div class="container">
-    <form ng-submit="true">
-    </form>
-  </div>
-
+    <nav>
+      <ul>
+        <li><a ui-sref="main">Main</a></li>
+        <li><a ui-sref="form">Form</a></li>
+      </ul>
+    </nav>
+    <div ui-view class="main-content"></div>
     <!-- bower:js -->
     <!-- endbower -->
 
