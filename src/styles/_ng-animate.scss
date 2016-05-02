@@ -1,0 +1,6 @@
+.slide-down-enter{
+  &.ng-enter,
+  &.ng-leave{
+    @include transition(0.1s linear all);
+  }
+}

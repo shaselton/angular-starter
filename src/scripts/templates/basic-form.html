@@ -1,18 +1,48 @@
 <div class="container">
-  <form class="col-lg-offset-3 col-lg-6">
+  <form class="col-lg-offset-3 col-lg-6" role="form" name="basicForm" ng-submit="submitForm(basicForm.$valid)" novalidate>
+    <div class="form-group" ng-class="{'has-error': (basicForm.$submitted || basicForm.first_name.$dirty && basicForm.first_name.$invalid), 'has-success': (basicForm.first_name.$dirty && basicForm.first_name.$valid)}">
+      <label for="exampleInputName">First Name</label>
+      <input
+        name="first_name"
+        ng-model="fd.first_name"
+        required
+        name-validation
+        type="input" 
+        class="form-control" 
+        id="exampleInputName" 
+        placeholder="Full Name">
+
+      <ng-messages 
+        class="has-error slide-down-enter" 
+        for="basicForm.first_name.$error" 
+        role="alert"
+        ng-if="(basicForm.$submitted || basicForm.first_name.$dirty && basicForm.first_name.$invalid)">
+
+        <p class="help-block" ng-message="required">This field is required</p>
+        <p class="help-block" ng-message="nameLength">Name is not long enough</p>
+      </ng-messages>
+      <!--{{basicForm}}-->
+    </div>
     <div class="form-group">
       <label for="exampleInputEmail1">Email address</label>
-      <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+      <input
+        ng-required="true"
+        type="email" 
+        class="form-control" 
+        id="exampleInputEmail1" 
+        placeholder="Email">
     </div>
     <div class="form-group">
       <label for="exampleInputPassword1">Password</label>
-      <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+      <input 
+        ng-required="true"
+        type="password" 
+        class="form-control" 
+        id="exampleInputPassword1" 
+        placeholder="Password">
     </div>
-    <div class="form-group">
-      <label for="exampleInputFile">File input</label>
-      <input type="file" id="exampleInputFile">
-      <p class="help-block">Example block-level help text here.</p>
+    <div class="form-group form-group-submit">
+      <button class="btn btn-default" ng-disabled="disabled">Submit</button>
     </div>
-    <button type="submit" class="btn btn-default">Submit</button>
   </form>
 </div>

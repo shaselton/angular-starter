@@ -109,7 +109,7 @@ gulp.task('browser:development', function(){
 
   gulp.watch(["src/**/*.scss", "src/**/*.css"], ['styles:development']);
   gulp.watch(["src/*.html"], ['inject:development']);
-  gulp.watch(["src/**/*.js", "src/*.js"], ['scripts:development']);
+  gulp.watch(["src/**/*.js", "src/*.js", "src/scripts/**/*.html"], ['scripts:development']);
   gulp.watch("tmp/index.html").on('change', browserSync.reload);
 });
 

@@ -5,6 +5,8 @@ var app = window.app || {};
 
 	app = angular.module('app', [
     'ui.router',
-    'ngMessages'
+    'ngMessages',
+    'ngAnimate',
+    'nameValidationDirective'
   ]);
 })(window.angular, window.app);
